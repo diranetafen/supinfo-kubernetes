@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+      - containerPort: 80 
+    volumeMounts:
+    - mountPath: /etc/nginx # mount nginx-conf volume to /etc/nginx
+      readOnly: true
+      name: nginx-conf
+    
+  volumes:
+  - name: nginx-conf
+    configMap:
+      name: nginx-conf # place ConfigMap `nginx-conf` on /etc/nginx
+      items:
+        - key: nginx.conf
+          path: nginx.conf
+        - key: proxy.conf
+          path: proxy.conf
+        - key: fastcgi.conf
+          path: fastcgi.conf
+        - key: mime.types
+          path: mime.types
+        - key: index.html
+          path: html/index.html
+    

@@ -1,0 +1,128 @@
+apiVersion: v1
+data:
+  fastcgi.conf: |
+    fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+    fastcgi_param  QUERY_STRING       $query_string;
+    fastcgi_param  REQUEST_METHOD     $request_method;
+    fastcgi_param  CONTENT_TYPE       $content_type;
+    fastcgi_param  CONTENT_LENGTH     $content_length;
+    fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+    fastcgi_param  REQUEST_URI        $request_uri;
+    fastcgi_param  DOCUMENT_URI       $document_uri;
+    fastcgi_param  DOCUMENT_ROOT      $document_root;
+    fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+    fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+    fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+    fastcgi_param  REMOTE_ADDR        $remote_addr;
+    fastcgi_param  REMOTE_PORT        $remote_port;
+    fastcgi_param  SERVER_ADDR        $server_addr;
+    fastcgi_param  SERVER_PORT        $server_port;
+    fastcgi_param  SERVER_NAME        $server_name;
+
+    fastcgi_index  index.php;
+
+    fastcgi_param  REDIRECT_STATUS    200;
+  index.html: |
+    <!doctype html>
+    <html>
+      <head>
+        <title>This is the title of the webpage!</title>
+      </head>
+      <body>
+        <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
+      </body>
+    </html>
+  mime.types: |
+    types {
+      text/html                             html htm shtml;
+      text/css                              css;
+      text/xml                              xml rss;
+      image/gif                             gif;
+      image/jpeg                            jpeg jpg;
+      application/x-javascript              js;
+      text/plain                            txt;
+      text/x-component                      htc;
+      text/mathml                           mml;
+      image/png                             png;
+      image/x-icon                          ico;
+      image/x-jng                           jng;
+      image/vnd.wap.wbmp                    wbmp;
+      application/java-archive              jar war ear;
+      application/mac-binhex40              hqx;
+      application/pdf                       pdf;
+      application/x-cocoa                   cco;
+      application/x-java-archive-diff       jardiff;
+      application/x-java-jnlp-file          jnlp;
+      application/x-makeself                run;
+      application/x-perl                    pl pm;
+      application/x-pilot                   prc pdb;
+      application/x-rar-compressed          rar;
+      application/x-redhat-package-manager  rpm;
+      application/x-sea                     sea;
+      application/x-shockwave-flash         swf;
+      application/x-stuffit                 sit;
+      application/x-tcl                     tcl tk;
+      application/x-x509-ca-cert            der pem crt;
+      application/x-xpinstall               xpi;
+      application/zip                       zip;
+      application/octet-stream              deb;
+      application/octet-stream              bin exe dll;
+      application/octet-stream              dmg;
+      application/octet-stream              eot;
+      application/octet-stream              iso img;
+      application/octet-stream              msi msp msm;
+      audio/mpeg                            mp3;
+      audio/x-realaudio                     ra;
+      video/mpeg                            mpeg mpg;
+      video/quicktime                       mov;
+      video/x-flv                           flv;
+      video/x-msvideo                       avi;
+      video/x-ms-wmv                        wmv;
+      video/x-ms-asf                        asx asf;
+      video/x-mng                           mng;
+    }
+  nginx.conf: "user  nginx;  ## Default: nobody\nworker_processes  5;  ## Default:
+    1\nerror_log  /var/log/nginx/error.log warn; \npid        /var/run/nginx.pid;
+    \nworker_rlimit_nofile 8192;\n\nevents {\n  worker_connections  4096;  ## Default:
+    1024\n}\n\nhttp {\n  include    /etc/nginx/mime.types;\n  include    /etc/nginx/proxy.conf;\n
+    \ include    /etc/nginx/fastcgi.conf;\n  index    index.html;\n\n  default_type
+    application/octet-stream;\n  log_format   main '$remote_addr - $remote_user [$time_local]
+    \ $status '\n    '\"$request\" $body_bytes_sent \"$http_referer\" '\n    '\"$http_user_agent\"
+    \"$http_x_forwarded_for\"';\n  access_log   /var/log/nginx/access.log  main;\n
+    \ sendfile     on;\n  tcp_nopush   on;\n  server_names_hash_bucket_size 128; #
+    this seems to be required for some vhosts\n\n  server { # php/fastcgi\n    listen
+    \      80;\n    server_name  domain1.com www.domain1.com;\n    access_log   /var/log/nginx/domain1.access.log
+    \ main;\n    root         html;\n\n    location ~ \\.php$ {\n      fastcgi_pass
+    \  127.0.0.1:1025;\n    }\n  }\n\n  server { # simple reverse-proxy\n    listen
+    \      80;\n    server_name  domain2.com www.domain2.com;\n    access_log   /var/log/nginx/domain2.access.log
+    \ main;\n\n    # serve static files\n    location ~ ^/(images|javascript|js|css|flash|media|static)/
+    \ {\n      root    /var/www/virtual/big.server.com/htdocs;\n      expires 30d;\n
+    \   }\n\n    # pass requests for dynamic content to rails/turbogears/zope, et
+    al\n    location / {\n      proxy_pass      http://127.0.0.1:8080;\n    }\n  }\n\n
+    \ upstream big_server_com {\n    server 127.0.0.3:8000 weight=5;\n    server 127.0.0.3:8001
+    weight=5;\n    server 192.168.0.1:8000;\n    server 192.168.0.1:8001;\n  }\n\n
+    \ server { # simple load balancing\n    listen          80;\n    server_name     big.server.com;\n
+    \   access_log      /var/log/nginx/big.server.access.log main;\n\n    location
+    / {\n      proxy_pass      http://big_server_com;\n    }\n  }\n}\n"
+  proxy.conf: |
+    proxy_redirect          off;
+    proxy_set_header        Host            $host;
+    proxy_set_header        X-Real-IP       $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    client_max_body_size    10m;
+    client_body_buffer_size 128k;
+    proxy_connect_timeout   90;
+    proxy_send_timeout      90;
+    proxy_read_timeout      90;
+    proxy_buffers           32 4k;
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"fastcgi.conf":"fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;\nfastcgi_param  QUERY_STRING       $query_string;\nfastcgi_param  REQUEST_METHOD     $request_method;\nfastcgi_param  CONTENT_TYPE       $content_type;\nfastcgi_param  CONTENT_LENGTH     $content_length;\nfastcgi_param  SCRIPT_NAME        $fastcgi_script_name;\nfastcgi_param  REQUEST_URI        $request_uri;\nfastcgi_param  DOCUMENT_URI       $document_uri;\nfastcgi_param  DOCUMENT_ROOT      $document_root;\nfastcgi_param  SERVER_PROTOCOL    $server_protocol;\nfastcgi_param  GATEWAY_INTERFACE  CGI/1.1;\nfastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;\nfastcgi_param  REMOTE_ADDR        $remote_addr;\nfastcgi_param  REMOTE_PORT        $remote_port;\nfastcgi_param  SERVER_ADDR        $server_addr;\nfastcgi_param  SERVER_PORT        $server_port;\nfastcgi_param  SERVER_NAME        $server_name;\n\nfastcgi_index  index.php;\n\nfastcgi_param  REDIRECT_STATUS    200;\n","index.html":"\u003c!doctype html\u003e\n\u003chtml\u003e\n  \u003chead\u003e\n    \u003ctitle\u003eThis is the title of the webpage!\u003c/title\u003e\n  \u003c/head\u003e\n  \u003cbody\u003e\n    \u003cp\u003eThis is an example paragraph. Anything in the \u003cstrong\u003ebody\u003c/strong\u003e tag will appear on the page, just like this \u003cstrong\u003ep\u003c/strong\u003e tag and its contents.\u003c/p\u003e\n  \u003c/body\u003e\n\u003c/html\u003e\n","mime.types":"types {\n  text/html                             html htm shtml;\n  text/css                              css;\n  text/xml                              xml rss;\n  image/gif                             gif;\n  image/jpeg                            jpeg jpg;\n  application/x-javascript              js;\n  text/plain                            txt;\n  text/x-component                      htc;\n  text/mathml                           mml;\n  image/png                             png;\n  image/x-icon                          ico;\n  image/x-jng                           jng;\n  image/vnd.wap.wbmp                    wbmp;\n  application/java-archive              jar war ear;\n  application/mac-binhex40              hqx;\n  application/pdf                       pdf;\n  application/x-cocoa                   cco;\n  application/x-java-archive-diff       jardiff;\n  application/x-java-jnlp-file          jnlp;\n  application/x-makeself                run;\n  application/x-perl                    pl pm;\n  application/x-pilot                   prc pdb;\n  application/x-rar-compressed          rar;\n  application/x-redhat-package-manager  rpm;\n  application/x-sea                     sea;\n  application/x-shockwave-flash         swf;\n  application/x-stuffit                 sit;\n  application/x-tcl                     tcl tk;\n  application/x-x509-ca-cert            der pem crt;\n  application/x-xpinstall               xpi;\n  application/zip                       zip;\n  application/octet-stream              deb;\n  application/octet-stream              bin exe dll;\n  application/octet-stream              dmg;\n  application/octet-stream              eot;\n  application/octet-stream              iso img;\n  application/octet-stream              msi msp msm;\n  audio/mpeg                            mp3;\n  audio/x-realaudio                     ra;\n  video/mpeg                            mpeg mpg;\n  video/quicktime                       mov;\n  video/x-flv                           flv;\n  video/x-msvideo                       avi;\n  video/x-ms-wmv                        wmv;\n  video/x-ms-asf                        asx asf;\n  video/x-mng                           mng;\n}\n","nginx.conf":"user  nginx;  ## Default: nobody\nworker_processes  5;  ## Default: 1\nerror_log  /var/log/nginx/error.log warn; \npid        /var/run/nginx.pid; \nworker_rlimit_nofile 8192;\n\nevents {\n  worker_connections  4096;  ## Default: 1024\n}\n\nhttp {\n  include    /etc/nginx/mime.types;\n  include    /etc/nginx/proxy.conf;\n  include    /etc/nginx/fastcgi.conf;\n  index    index.html;\n\n  default_type application/octet-stream;\n  log_format   main '$remote_addr - $remote_user [$time_local]  $status '\n    '\"$request\" $body_bytes_sent \"$http_referer\" '\n    '\"$http_user_agent\" \"$http_x_forwarded_for\"';\n  access_log   /var/log/nginx/access.log  main;\n  sendfile     on;\n  tcp_nopush   on;\n  server_names_hash_bucket_size 128; # this seems to be required for some vhosts\n\n  server { # php/fastcgi\n    listen       80;\n    server_name  domain1.com www.domain1.com;\n    access_log   /var/log/nginx/domain1.access.log  main;\n    root         html;\n\n    location ~ \\.php$ {\n      fastcgi_pass   127.0.0.1:1025;\n    }\n  }\n\n  server { # simple reverse-proxy\n    listen       80;\n    server_name  domain2.com www.domain2.com;\n    access_log   /var/log/nginx/domain2.access.log  main;\n\n    # serve static files\n    location ~ ^/(images|javascript|js|css|flash|media|static)/  {\n      root    /var/www/virtual/big.server.com/htdocs;\n      expires 30d;\n    }\n\n    # pass requests for dynamic content to rails/turbogears/zope, et al\n    location / {\n      proxy_pass      http://127.0.0.1:8080;\n    }\n  }\n\n  upstream big_server_com {\n    server 127.0.0.3:8000 weight=5;\n    server 127.0.0.3:8001 weight=5;\n    server 192.168.0.1:8000;\n    server 192.168.0.1:8001;\n  }\n\n  server { # simple load balancing\n    listen          80;\n    server_name     big.server.com;\n    access_log      /var/log/nginx/big.server.access.log main;\n\n    location / {\n      proxy_pass      http://big_server_com;\n    }\n  }\n}\n","proxy.conf":"proxy_redirect          off;\nproxy_set_header        Host            $host;\nproxy_set_header        X-Real-IP       $remote_addr;\nproxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;\nclient_max_body_size    10m;\nclient_body_buffer_size 128k;\nproxy_connect_timeout   90;\nproxy_send_timeout      90;\nproxy_read_timeout      90;\nproxy_buffers           32 4k;\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"nginx-conf","namespace":"default"}}
+  creationTimestamp: "2019-01-23T21:14:27Z"
+  name: nginx-conf
+  namespace: default
+  resourceVersion: "266007"
+  selfLink: /api/v1/namespaces/default/configmaps/nginx-conf
+  uid: de08ec8b-1f53-11e9-88d5-000c294aacd4
