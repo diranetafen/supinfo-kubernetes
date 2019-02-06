@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  rules:
+  - host: website.k8s.lan 
+    http:
+      paths:
+      - backend:
+          serviceName: service-nginx-clusterip  
+          servicePort: 8090 
