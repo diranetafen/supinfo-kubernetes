@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      containers:
+      - name: postgres 
+        image: postgres
+        env:
+        - name: POSTGRES_PASSWORD
+          value: supinfo
+        - name: POSTGRES_USER
+          value: supinfo
+        - name: POSTGRES_DB
+          value: images 
+        ports:
+        - containerPort: 5432 
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/"
+          name: storage
+        - mountPath: "/docker-entrypoint-initdb.d/tables.sql"
+          name: postgres-tables
+          subPath: tables.sql
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: local-pvc-sdb
+        - name: postgres-tables
+          configMap:
+            name: postgres-tables

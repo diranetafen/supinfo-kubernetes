@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: service-image-api-clusterip
+spec:
+  selector:
+    app: image-api 
+  ports:
+  - protocol: TCP
+    port: 3000 
+    targetPort: 3000 

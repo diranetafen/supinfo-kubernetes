@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: image-api-ingress
+spec:
+  rules:
+  - host: image-api.k8s.lan  
+    http:
+      paths:
+      - backend:
+          serviceName: service-image-api-clusterip  
+          servicePort: 3000 
