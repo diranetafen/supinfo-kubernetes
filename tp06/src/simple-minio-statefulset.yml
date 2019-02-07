@@ -39,8 +39,14 @@ spec:
         - containerPort: 9000 
         volumeMounts:
         - mountPath: "/data"
-          name: data 
-      volumes:
-      - name: data 
-        persistentVolumeClaim:
-          claimName: local-pvc-sdc 
+          name: local-pvc 
+  volumeClaimTemplates:
+  - metadata:
+      name: local-pvc
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: local-storage
+      resources:
+        requests:
+          storage: 10Gi
