@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet 
+metadata:
+  name: minio 
+  labels:
+    app: minio 
+spec:
+  serviceName: minio
+  replicas: 4 
+  selector:
+    matchLabels:
+      app: minio 
+  template:
+    metadata:
+      labels:
+        app: minio 
+    spec:
+      spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      containers:
+      - name: minio 
+        image: minio/minio 
+        env:
+        - name: MINIO_ACCESS_KEY 
+          value: "supinfo"
+        - name: MINIO_SECRET_KEY 
+          value: "supinfo1234"
+        args:
+        - server
+        - http://minio-0.minio.imageresizer.svc.cluster.local/data
+        - http://minio-1.minio.imageresizer.svc.cluster.local/data
+        - http://minio-2.minio.imageresizer.svc.cluster.local/data
+        - http://minio-3.minio.imageresizer.svc.cluster.local/data
+        ports:
+        - containerPort: 9000 
+        volumeMounts:
+        - mountPath: "/data"
+          name: data 
+      volumes:
+      - name: data 
+        persistentVolumeClaim:
+          claimName: local-pvc-sdc 
