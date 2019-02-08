@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "worker.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "worker.name" . }}
+    helm.sh/chart: {{ include "worker.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "worker.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "worker.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: STORAGE_BUCKETNAME
+              value: "{{ .Values.storage.bucketname }}"
+            - name: STORAGE_SERVER
+              value: "{{ .Values.storage.server }}"
+            - name: STORAGE_ACCESSKEY
+              value: "{{ .Values.storage.accesskey }}"
+            - name: STORAGE_SECRETKEY
+              value: "{{ .Values.storage.secretkey }}"
+            - name: STORAGE_SSL
+              value: "{{ .Values.storage.ssl }}"
+            - name: NATS_SERVERS
+              value: "{{ .Values.nats.servers }}"
+            - name: NATS_QUEUE
+              value: "{{ .Values.nats.queue }}"
+            - name: POSTGRES_CONNECTION_STRING 
+              value: "{{ .Values.postgres.connection_string }}"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

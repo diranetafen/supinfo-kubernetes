@@ -1,0 +1,45 @@
+# Default values for worker.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: alexandrevilain/image-resizer-worker 
+  tag: latest 
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+storage:
+  bucketname: imageresizer
+  server: 10.105.53.251:9000
+  accesskey: supinfo
+  secretkey: supinfo1234
+  ssl: false 
+
+nats:
+  servers: "nats://10.100.35.114:4222"
+  queue: "jobs"
+
+postgres:
+  connection_string: "postgres://supinfo:supinfo@10.98.240.92:5432/images?sslmode=disable"
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
