@@ -33,14 +33,14 @@ ingress:
 api_port: 8000 
 storage:
   bucketname: imageresizer
-  server: 10.105.53.251
+  server: service-minio-clusterip.imageresizer.svc.cluster.local 
   port: 9000
   accesskey: supinfo
   secretkey: supinfo1234
   ssl: false 
 
 nats:
-  connectionstrings: "nats://10.100.35.114:4222"
+  connectionstrings: "nats://nats-nats-client.imageresizer.svc.cluster.local:4222"
   queue: "jobs"
 
 resources: {}
