@@ -41,7 +41,7 @@ spec:
       volumes:
         - name: storage
           persistentVolumeClaim:
-            claimName: local-pvc-sdb
+            claimName: postgres-pv-claim
         - name: postgres-tables
           configMap:
             name: postgres-tables

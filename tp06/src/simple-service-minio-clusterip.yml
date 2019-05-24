@@ -4,7 +4,7 @@ metadata:
   name: service-minio-clusterip
 spec:
   selector:
-    app: minio 
+    app: minio
   ports:
   - protocol: TCP 
     port: 9000 

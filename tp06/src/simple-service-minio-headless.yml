@@ -1,13 +1,14 @@
+## Create headless service to StatefulSet to work.
 apiVersion: v1
 kind: Service
 metadata:
-  name: minio 
+  name: minio
   labels:
-    app: minio 
+    app: minio
 spec:
   ports:
-  - port: 9000 
-    name: minio 
+  - port: 9000
+    name: minio
   clusterIP: None
   selector:
-    app: minio 
+    app: minio

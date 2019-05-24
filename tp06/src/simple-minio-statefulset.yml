@@ -1,34 +1,26 @@
-apiVersion: apps/v1
-kind: StatefulSet 
+apiVersion: apps/v1beta2
+kind: StatefulSet
 metadata:
-  name: minio 
-  labels:
-    app: minio 
+  name: minio
 spec:
-  serviceName: minio
-  replicas: 4 
+  serviceName: "minio"
+  replicas: 4
   selector:
     matchLabels:
-      app: minio 
+      app: minio
   template:
     metadata:
       labels:
-        app: minio 
+        app: minio
     spec:
-      spec:
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/master
-      nodeSelector:
-        node-role.kubernetes.io/master: ""
       containers:
-      - name: minio 
-        image: minio/minio 
+      - name: minio
         env:
-        - name: MINIO_ACCESS_KEY 
-          value: "supinfo"
-        - name: MINIO_SECRET_KEY 
-          value: "supinfo1234"
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "minio123"
+        image: minio/minio:RELEASE.2017-11-22T19-55-46Z
         args:
         - server
         - http://minio-0.minio.imageresizer.svc.cluster.local/data
@@ -36,17 +28,16 @@ spec:
         - http://minio-2.minio.imageresizer.svc.cluster.local/data
         - http://minio-3.minio.imageresizer.svc.cluster.local/data
         ports:
-        - containerPort: 9000 
+        - containerPort: 9000
+          name: minio
         volumeMounts:
-        - mountPath: "/data"
-          name: local-pvc 
+        - name: data
+          mountPath: /data
   volumeClaimTemplates:
   - metadata:
-      name: local-pvc
+      name: data
     spec:
-      accessModes:
-      - ReadWriteOnce
-      storageClassName: local-storage
+      accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 10Gi
+          storage: 1Gi

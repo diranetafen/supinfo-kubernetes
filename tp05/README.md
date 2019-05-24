@@ -1,14 +1,10 @@
 # this guide resume how to use src file
 
-## ** create local disk 500Go for postgresql data **
-To store data permanently, we need `persistent volume`
-Because we are working with local cluster, we will create local disk dedicated at this task inspired by [serverascode](https://serverascode.com/2018/09/19/persistent-local-volumes-kubernetes.html) tutorial
+## ** create local folder for postgresql data **
+Because we use minikube, we need to create a dedicated folder to store persistent volume
 
 ```
-mkfs.ext4 /dev/sdb
-mkdir -p /mnt/disks/sdb
-mount /dev/sdb /mnt/disks/sdb
-lsblk
+mkdir /mnt/data
 ```
 
 ## ** kubectl alias **
@@ -25,11 +21,9 @@ kubectl create -f namespace-imageresizer.yml
 
 ## ** create persistent volume **
 ```
-kubectl create -f storage-class.yml -n=imageresizer
-k get sc
-kubectl create -f local-pv-sdb.yml -n=imageresizer
+kubectl create -f local-pv-postgres.yml -n=imageresizer
 k get pv
-kubectl create -f local-pvc-sdb.yml -n=imageresizer
+kubectl create -f local-pvc-postgres.yml -n=imageresizer
 k get pvc
 ```
 
