@@ -55,5 +55,5 @@ docker build -t frontend .
 ### deploy the frontend ###
 
 ```
-docker run -d --name frontend -p 80:80 frontend
+docker run -d --name frontend -p 8080:80 frontend
 ```
