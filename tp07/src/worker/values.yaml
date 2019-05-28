@@ -14,7 +14,7 @@ fullnameOverride: ""
 
 storage:
   bucketname: imageresizer
-  server: :9000
+  server: minio.imageresizer.svc.cluster.local:9000
   accesskey: supinfo
   secretkey: supinfo1234
   ssl: false 
