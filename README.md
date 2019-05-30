@@ -1,1 +1,0 @@
-# supinfo-kubernetes

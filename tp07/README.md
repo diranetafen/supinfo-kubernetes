@@ -1,5 +1,13 @@
 # this guide resume how to use src file
 
+
+## ** kubectl alias **
+we set an alias for the exercise purpose
+
+```
+alias k="kubectl -n=imageresizer"
+```
+
 ## * Install Helm * ##
 
 ```

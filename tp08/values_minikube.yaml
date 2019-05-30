@@ -1,0 +1,19 @@
+coreDns:
+  service:
+    selector:
+      k8s-app: kube-dns
+kubeControllerManager:
+  service:
+    selector:
+      k8s-app: null
+      component: kube-controller-manager
+kubeEtcd:
+  service:
+    selector:
+      k8s-app: null
+      component: etcd
+kubeScheduler:
+  service:
+    selector:
+      k8s-app: null
+      component: kube-scheduler
