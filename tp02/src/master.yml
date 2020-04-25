@@ -27,8 +27,7 @@
       become: yes
       become_user: osboxes 
       shell: |
-        kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-        kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml >> pod_network_setup.txt
+        kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
       args:
         chdir: $HOME
         creates: pod_network_setup.txt
